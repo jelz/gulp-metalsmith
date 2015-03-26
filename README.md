@@ -55,7 +55,7 @@ You can do this:
 ```js
 gulp.task('metalsmith-json', ['clean'], function() {
     return gulp.src('src/pages.json').
-        pipe(metalsmith({ use: [ layouts({ engine: 'swig' }) ])).
+        pipe(metalsmith.json({ use: [ layouts({ engine: 'swig' }) ])).
         pipe(gulp.dest('build'));
 });
 ```
