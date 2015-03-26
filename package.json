@@ -1,0 +1,24 @@
+{
+  "name": "gulp-metalsmith",
+  "version": "0.0.1",
+  "main": "./lib/index.js",
+  "author": "Jakub Elżbieciak <jelz@post.pl>",
+  "license": "MIT",
+  "dependencies": {
+    "extend": "^2.0.0",
+    "front-matter": "^1.0.0",
+    "gulp-util": "^3.0.4",
+    "is_js": "^0.7.3",
+    "through2": "^0.6.3",
+    "vinyl-fs": "^1.0.0",
+    "ware": "^1.2.0"
+  },
+  "devDependencies": {
+    "del": "^1.1.1",
+    "gulp": "^3.8.11",
+    "metalsmith-layouts": "^1.0.0",
+    "metalsmith-permalinks": "^0.4.0",
+    "swig": "^1.4.2",
+    "tape": "^3.5.0"
+  }
+}

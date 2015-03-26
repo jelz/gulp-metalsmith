@@ -1,0 +1,10 @@
+{
+  "index.html": {
+    "title": "Index",
+    "contents": "<h2>Index page</h2>"
+  },
+  "contact.html": {
+    "title": "Contact",
+    "contents": "<h2>Contact page</h2>"
+  }
+}
