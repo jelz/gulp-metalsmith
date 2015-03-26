@@ -1,6 +1,8 @@
 {
   "name": "gulp-metalsmith",
-  "version": "0.0.1",
+  "version": "0.0.2",
+  "description": "Lightweight gulp plugin for Metalsmith",
+  "repository": "https://github.com/jelz/gulp-metalsmith",
   "main": "./lib/index.js",
   "author": "Jakub Elżbieciak <jelz@post.pl>",
   "license": "MIT",
