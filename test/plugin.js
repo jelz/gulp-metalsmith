@@ -4,6 +4,7 @@ var gutil = require('gulp-util');
 var through = require('through2');
 var vinyl = require('vinyl-fs');
 var path = require('path');
+var fs = require('fs');
 
 var plugin = require('..');
 
@@ -51,6 +52,15 @@ test('Handle file buffer vinyl stream', function(t) {
     t.plan(2);
     vinyl.src(base_src('**')).pipe(plugin()).pipe(through.obj(function(f, enc, cb) {
         content_tests.forEach(function(i) { if (test_file_content(f, enc, i)) { t.pass(); }});
+        cb();
+    }));
+});
+
+test('Handle non-utf8 files', function (t) {
+    t.plan(2);
+    vinyl.src(base_src('*.jpg')).pipe(plugin()).pipe(through.obj(function (f, enc, cb) {
+        t.true(f.isBuffer());
+        t.true(f.contents.equals(fs.readFileSync(base_src('trees.jpg'))));
         cb();
     }));
 });
