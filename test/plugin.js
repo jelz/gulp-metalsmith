@@ -1,5 +1,5 @@
 var test = require('tape');
-var is = require('is_js');
+var _ = require('lodash');
 var gutil = require('gulp-util');
 var through = require('through2');
 var vinyl = require('vinyl-fs');
@@ -18,12 +18,12 @@ function base_src(p) { return path.join(base, 'src', p || ''); }
 function base_json(p) { return path.join(base, 'json', p || ''); }
 
 function test_file_content(f, enc, i) {
-    return f.isBuffer() && is.include(f.path, i.file) && is.include(f.contents.toString(enc), i.text);
+    return f.isBuffer() && _.includes(f.path, i.file) && _.includes(f.contents.toString(enc), i.text);
 }
 
 test('Plugin API', function(t) {
-    t.true(is.function(plugin));
-    t.true(is.function(plugin.json));
+    t.true(_.isFunction(plugin));
+    t.true(_.isFunction(plugin.json));
     t.end();
 });
 
@@ -31,7 +31,7 @@ test('Return object with through2 API', function(t) {
     var methods = ['emit', 'on', 'pipe', 'push', 'write', 'end'];
     var p = plugin();
     t.plan(methods.length);
-    methods.forEach(function(m) { t.true(is.function(p[m])); });
+    methods.forEach(function(m) { t.true(_.isFunction(p[m])); });
 });
 
 test('Fail on stream', function(t) {
@@ -40,7 +40,7 @@ test('Fail on stream', function(t) {
     s.on('error', function(err) {
         t.true(err instanceof gutil.PluginError);
         t.equal(err.plugin, plugin.PLUGIN_NAME);
-        t.true(is.include(err.message, 'not supported'));
+        t.true(_.includes(err.message, 'not supported'));
     });
 
     t.plan(4);
@@ -72,7 +72,7 @@ test('Frontmatter config', function(t) {
 
     function test_stream(method) {
         return through.obj(function(f, enc) {
-            t[method](is.include(f.contents.toString(enc), '---'));
+            t[method](_.includes(f.contents.toString(enc), '---'));
         });
     }
 });

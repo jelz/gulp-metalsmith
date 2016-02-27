@@ -10,11 +10,10 @@
     "test": "faucet test/*.js"
   },
   "dependencies": {
-    "extend": "^2.0.0",
     "front-matter": "^1.0.0",
     "gulp-util": "^3.0.4",
     "is-utf8": "^0.2.1",
-    "is_js": "^0.7.3",
+    "lodash": "^4.5.1",
     "through2": "^0.6.3",
     "vinyl-fs": "^1.0.0",
     "ware": "^1.2.0"

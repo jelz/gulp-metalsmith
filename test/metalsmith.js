@@ -1,12 +1,12 @@
 var test = require('tape');
-var is = require('is_js');
+var _ = require('lodash');
 var metalsmith = require('../lib/metalsmith.js');
 
 test('Metalsmith API', function(t) {
     var methods = ['build', 'source', 'destination', 'clean', 'frontmatter', 'use', 'run', 'metadata', 'path'];
     var m = metalsmith();
     t.plan(methods.length);
-    methods.forEach(function(k) { t.true(is.function(m[k])); });
+    methods.forEach(function(k) { t.true(_.isFunction(m[k])); });
 });
 
 test('Setter chaining', function(t) {
@@ -30,7 +30,7 @@ test('Build stub method', function(t) {
     var m = metalsmith();
     t.plan(2);
     m.build(function(err, files) {
-        t.true(is.null(err));
+        t.true(_.isNull(err));
         t.equal(files.length, 0);
     });
 });
@@ -60,8 +60,8 @@ test('Run middlewares', function(t) {
     m.use(function(files, m, next) { files.added_file = {}; next(); });
     m.use(function(files, m, next) { m.metadata().added_metadata = 123; next(); });
     m.run({}, function(err, files) {
-        t.true(is.null(err));
-        t.true(is.object(files.added_file));
+        t.true(_.isNull(err));
+        t.true(_.isObject(files.added_file));
         t.equal(m.metadata().added_metadata, 123);
     });
 });
@@ -73,7 +73,7 @@ test('Middleware errors', function(t) {
     m.use(function(f, m, cb) { cb(new Error('Second middleware error.')); });
     m.use(function(f, m, cb) { cb(new Error('Last middleware error.')); });
     m.run({}, function(err) {
-        t.true(is.error(err));
+        t.true(_.isError(err));
         t.equal(err.message, 'Second middleware error.');
     });
 });
