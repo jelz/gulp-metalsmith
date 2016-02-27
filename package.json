@@ -1,30 +1,36 @@
 {
   "name": "gulp-metalsmith",
-  "version": "0.0.4",
+  "version": "0.1.0",
   "description": "Lightweight gulp plugin for Metalsmith",
-  "repository": "https://github.com/jelz/gulp-metalsmith",
-  "main": "./lib/index.js",
-  "author": "Jakub Elżbieciak <jelz@post.pl>",
+  "keywords": [
+    "metalsmith",
+    "gulp",
+    "gulpplugin"
+  ],
+  "repository": "jelz/gulp-metalsmith",
+  "main": "lib/index.js",
+  "author": "Jakub Elżbieciak <jelz@post.pl> (https://elzbieciak.pl)",
   "license": "MIT",
   "scripts": {
-    "test": "faucet test/*.js"
+    "test": "faucet test/*.js",
+    "clean": "rm -rf node_modules example/build"
   },
   "dependencies": {
-    "front-matter": "^1.0.0",
+    "front-matter": "^2.0.6",
     "gulp-util": "^3.0.4",
     "is-utf8": "^0.2.1",
     "lodash": "^4.5.1",
-    "through2": "^0.6.3",
-    "vinyl-fs": "^1.0.0",
+    "through2": "^2.0.1",
+    "vinyl-fs": "^2.3.4",
     "ware": "^1.2.0"
   },
   "devDependencies": {
-    "del": "^1.1.1",
+    "del": "^2.2.0",
     "faucet": "0.0.1",
     "gulp": "^3.8.11",
     "metalsmith-layouts": "^1.0.0",
-    "metalsmith-permalinks": "^0.4.0",
+    "metalsmith-permalinks": "^0.5.0",
     "swig": "^1.4.2",
-    "tape": "^3.5.0"
+    "tape": "^4.4.0"
   }
 }
