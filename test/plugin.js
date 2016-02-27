@@ -1,119 +1,167 @@
 var test = require('tape');
-var _ = require('lodash');
 var gutil = require('gulp-util');
 var through = require('through2');
 var vinyl = require('vinyl-fs');
 var path = require('path');
 var fs = require('fs');
+var _ = require('lodash');
 
 var plugin = require('..');
 
-var base = path.join(__dirname, 'fixtures');
-var content_tests = [
-    { file: 'index.html', text: 'Index page' },
-    { file: 'contact.html', text: 'Contact page' }
-];
+var base = _.partial(path.join, __dirname, 'fixtures');
+var prepare = _.partial(prepareFn, 'src');
+var prepareJson = _.partial(prepareFn, 'json');
 
-function base_src(p) { return path.join(base, 'src', p || ''); }
-function base_json(p) { return path.join(base, 'json', p || ''); }
+function prepareFn(dir, globs, opts) {
+  var fn = dir === 'json' ? plugin.json : plugin;
+  globs = _.isString(globs) ? [globs] : globs;
+  globs = _.map(globs, function (glob) {
+    return base(dir, glob || '');
+  });
 
-function test_file_content(f, enc, i) {
-    return f.isBuffer() && _.includes(f.path, i.file) && _.includes(f.contents.toString(enc), i.text);
+  return vinyl.src(globs).pipe(fn(opts));
 }
 
-test('Plugin API', function(t) {
-    t.true(_.isFunction(plugin));
-    t.true(_.isFunction(plugin.json));
-    t.end();
+function testContent(f, path, str, fn) {
+  var fileMatches = f.path.substr(-path.length) === path;
+  var contentMatches = _.includes(f.contents.toString(), str);
+
+  if (fn && fileMatches && contentMatches) {
+    fn();
+  }
+}
+
+test('Plugin API', function (t) {
+  t.true(_.isFunction(plugin));
+  t.true(_.isFunction(plugin.json));
+  t.end();
 });
 
-test('Return object with through2 API', function(t) {
-    var methods = ['emit', 'on', 'pipe', 'push', 'write', 'end'];
-    var p = plugin();
-    t.plan(methods.length);
-    methods.forEach(function(m) { t.true(_.isFunction(p[m])); });
+test('Plugin returns a stream', function (t) {
+  var methods = ['emit', 'on', 'pipe', 'push', 'write', 'end'];
+  var p = plugin();
+  t.plan(methods.length);
+
+  methods.forEach(function (m) {
+    t.true(_.isFunction(p[m]));
+  });
 });
 
-test('Fail on stream', function(t) {
-    var file = new gutil.File({ contents: through.obj() });
-    var s = plugin();
-    s.on('error', function(err) {
-        t.true(err instanceof gutil.PluginError);
-        t.equal(err.plugin, plugin.PLUGIN_NAME);
-        t.true(_.includes(err.message, 'not supported'));
+test('Failure on a file containing a stream', function (t) {
+  var file = new gutil.File({contents: through.obj()});
+  var s = plugin();
+  t.plan(4);
+
+  s.on('error', function (err) {
+    t.true(err instanceof gutil.PluginError);
+    t.equals(err.plugin, plugin.PLUGIN_NAME);
+    t.true(_.includes(err.message, 'not supported'));
+  });
+
+  t.true(file.isStream());
+  s.end(file);
+});
+
+test('Handle a stream of buffered vinyl files', function (t) {
+  t.plan(3);
+  prepare('**').pipe(through.obj(function (f, enc, cb) {
+    testContent(f, 'index.html', 'Index page', t.pass);
+    testContent(f, 'contact.html', 'Contact page', t.pass);
+    cb();
+  }, t.pass));
+});
+
+test('Do not touch non-utf8 files', function (t) {
+  t.plan(6);
+
+  prepare('*.jpg').pipe(through.obj(function (f, enc, cb) {
+    t.true(f.isBuffer());
+    t.true(f.contents.equals(fs.readFileSync(base('src', 'trees.jpg'))));
+    cb();
+  }, t.pass));
+
+  prepareJson('*.png').pipe(through.obj(function (f, enc, cb) {
+    t.true(f.isBuffer());
+    t.true(f.contents.equals(fs.readFileSync(base('json', 'pc.png'))));
+    cb();
+  }, t.pass));
+});
+
+test('Frontmatter configuration option', function (t) {
+  t.plan(2);
+  prepare('index.html').pipe(stillIncludes(false));
+  prepare('contact.html', {frontmatter: false}).pipe(stillIncludes(true));
+
+  function stillIncludes(method) {
+    return through.obj(function (f, enc, cb) {
+      t[method ? 'true' : 'false'](_.includes(f.contents.toString(), '---'));
+      cb();
     });
-
-    t.plan(4);
-    t.true(file.isStream());
-    s.end(file);
+  }
 });
 
-test('Handle file buffer vinyl stream', function(t) {
-    t.plan(2);
-    vinyl.src(base_src('**')).pipe(plugin()).pipe(through.obj(function(f, enc, cb) {
-        content_tests.forEach(function(i) { if (test_file_content(f, enc, i)) { t.pass(); }});
-        cb();
-    }));
+test('Failure when Metalsmith fails', function (t) {
+  var s = prepare('**', {
+    use: [function (f, m, next) {
+      next(new Error('boom!'));
+    }]
+  });
+
+  t.plan(2);
+
+  s.on('error', function (err) {
+    t.true(err instanceof gutil.PluginError);
+    t.equals(err.message, 'boom!');
+  });
 });
 
-test('Handle non-utf8 files', function (t) {
-    t.plan(2);
-    vinyl.src(base_src('*.jpg')).pipe(plugin()).pipe(through.obj(function (f, enc, cb) {
-        t.true(f.isBuffer());
-        t.true(f.contents.equals(fs.readFileSync(base_src('trees.jpg'))));
-        cb();
-    }));
+test('Failure on an invalid JSON', function (t) {
+  t.plan(3);
+
+  prepareJson('invalid_page.json').on('error', isPluginError);
+  prepareJson('array.json').on('error', function (err) {
+    isPluginError(err);
+    t.true(_.includes(err.message, 'single root object'));
+  });
+
+  function isPluginError(err) {
+    t.true(err instanceof gutil.PluginError);
+  }
 });
 
-test('Frontmatter config', function(t) {
-    t.plan(2);
-    vinyl.src(base_src('index.html')).pipe(plugin()).pipe(test_stream('false'));
-    vinyl.src(base_src('contact.html')).pipe(plugin({ frontmatter: false })).pipe(test_stream('true'));
-
-    function test_stream(method) {
-        return through.obj(function(f, enc) {
-            t[method](_.includes(f.contents.toString(enc), '---'));
-        });
-    }
+test('Handle JSON input', function (t) {
+  t.plan(3);
+  prepareJson('pages.json').pipe(through.obj(function (f, enc, cb) {
+    testContent(f, 'index.html', 'Index page', t.pass);
+    testContent(f, 'contact.html', 'Contact page', t.pass);
+    cb();
+  }, t.pass));
 });
 
-test('Fail on invalid JSON', function(t) {
-    var s = plugin.json();
-    s.on('error', function(err) {
-        t.true(err instanceof gutil.PluginError);
-        t.equal(err.plugin, plugin.PLUGIN_NAME);
-    });
+test('Handle a multi-file JSON input', function (t) {
+  var s = prepareJson(['pages.json', 'offer_page.json']);
+  t.plan(4);
 
-    t.plan(2);
-    vinyl.src(base_json('invalid_page.json')).pipe(s);
+  s.pipe(through.obj(function (f, enc, cb) {
+    testContent(f, 'index.html', 'Index page', t.pass);
+    testContent(f, 'contact.html', 'Contact page', t.pass);
+    testContent(f, 'offer.html', 'Offer page', t.pass);
+    cb();
+  }, t.pass));
 });
 
-test('Handle JSON input', function(t) {
-    t.plan(2);
-    vinyl.src(base_json('pages.json')).pipe(plugin.json()).pipe(through.obj(function(f, enc, cb) {
-        content_tests.forEach(function(i) { if (test_file_content(f, enc, i)) { t.pass(); }});
-        cb();
-    }));
+test('Handle a JSON defined page w/o contents', function (t) {
+  t.plan(2);
+  prepareJson('empty_page.json').pipe(through.obj(function (f) {
+    t.equals(f.path, 'empty.html');
+    t.equals(f.contents.toString(), '');
+  }));
 });
 
-test('Handle JSON input from multiple files', function(t) {
-    var globs = [ base_json('pages.json'), base_json('offer_page.json') ];
-    t.plan(3);
-    vinyl.src(globs).pipe(plugin.json()).pipe(through.obj(function(f, enc, cb) {
-        t.pass(); cb();
-    }));
-});
-
-test('Handle JSON w/o contents', function(t) {
-    t.plan(1);
-    vinyl.src(base_json('empty_page.json')).pipe(plugin.json()).pipe(through.obj(function(f, enc) {
-        t.equal(f.contents.toString(enc), '');
-    }));
-});
-
-test('Ignore invalid file keys', function(t) {
-    t.plan(1);
-    vinyl.src(base_json('map_page.json')).pipe(plugin.json()).pipe(through.obj(function() {
-        t.pass();
-    }));
+test('Ignore invalid file keys', function (t) {
+  t.plan(2);
+  prepareJson('map_page.json').pipe(through.obj(function (f, enc, cb) {
+    t.equals(f.path, 'map.html');
+    cb();
+  }, t.pass));
 });
