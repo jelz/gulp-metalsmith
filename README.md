@@ -1,5 +1,12 @@
 # gulp-metalsmith
 
+[![npm](https://img.shields.io/npm/v/gulp-metalsmith.svg)](https://www.npmjs.com/package/gulp-metalsmith)
+[![Build Status](https://travis-ci.org/jelz/gulp-metalsmith.svg)](https://travis-ci.org/jelz/gulp-metalsmith)
+[![Code Coverage](https://codecov.io/github/jelz/gulp-metalsmith/coverage.svg?branch=master)](https://codecov.io/github/jelz/gulp-metalsmith?branch=master)
+[![npm](https://img.shields.io/npm/dt/gulp-metalsmith.svg)](https://www.npmjs.com/package/gulp-metalsmith)
+[![Dependency Status](https://david-dm.org/jelz/gulp-metalsmith.svg)](https://david-dm.org/jelz/gulp-metalsmith)
+[![devDependency Status](https://david-dm.org/jelz/gulp-metalsmith/dev-status.svg)](https://david-dm.org/jelz/gulp-metalsmith#info=devDependencies)
+
 `gulp-metalsmith` is a [gulp](https://github.com/gulpjs/gulp) plugin that incorporates [Metalsmith](http://www.metalsmith.io) builds into gulp pipelines. It aims to be as lightweight as possible. It ships with Metalsmith's replacement that has compatible API (can reuse Metalsmith plugins) and is able to recive JavaScript object containing page definitions. After build, it streams out `vinyl` files. The main difference between bundled Metalsmith and normal Metalsmith is that it does not perform any disc read/write operations, leaving it out to `gulp`.
 
 `gulp-metalsmith` can be feed with specially formatted JSON. It allows building static pages using content providers, like [prismic.io](https://prismic.io) or [Contentful](https://www.contentful.com).
