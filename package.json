@@ -15,6 +15,7 @@
     "lint": "jshint lib/*.js test/*.js example/*.js",
     "hint": "npm run lint",
     "test": "faucet test/*.js",
+    "test-all": "npm run lint && npm test",
     "clean": "rm -rf node_modules example/build"
   },
   "dependencies": {
