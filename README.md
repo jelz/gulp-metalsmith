@@ -22,21 +22,25 @@ $ npm install --save-dev gulp-metalsmith
 The simplest build task (just copies all files from `src/` to `build/`):
 ```js
 gulp.task('metalsmith', ['clean'], function() {
-    return gulp.src('src/**').
-        pipe(metalsmith()).
-        pipe(gulp.dest('build'));
+  return gulp.src('src/**')
+    .pipe(metalsmith())
+    .pipe(gulp.dest('build'));
 });
 ```
 
 All options:
 ```js
 s.pipe(metalsmith({
-    // set Metalsmith's root directory, for example for locating templates, defaults to CWD
-    root: __dirname, 
-    // read frontmatter, defaults to true
-    frontmatter: true,
-    // Metalsmith plugins to use
-    use: [ permalinks(), layouts({ engine: 'swig' }) ]
+  // set Metalsmith's root directory, for example for locating templates, defaults to CWD
+  root: __dirname, 
+  // read frontmatter, defaults to true
+  frontmatter: true,
+  // Metalsmith plugins to use
+  use: [ permalinks(), layouts({ engine: 'swig' }) ],
+  // Initial Metalsmith metadata:
+  metadata: {
+    site_title: 'Sample static site'
+  }
 }));
 ```
 
@@ -61,9 +65,9 @@ Given the file `src/pages.json`:
 You can do this:
 ```js
 gulp.task('metalsmith-json', ['clean'], function() {
-    return gulp.src('src/pages.json').
-        pipe(metalsmith.json({ use: [ layouts({ engine: 'swig' }) ])).
-        pipe(gulp.dest('build'));
+    return gulp.src('src/pages.json')
+      .pipe(metalsmith.json({ use: [ layouts({ engine: 'swig' }) ]))
+      .pipe(gulp.dest('build'));
 });
 ```
 
@@ -71,7 +75,7 @@ Multiple JSON files (`*.json`) are also accepted.
 
 ### Examples, tests
 
-Examples are stored in `example/`. Tests can be run using `tape` (you probably just need to type `faucet` in the project's root directory).
+Examples are stored in `example/`. Tests can be run with `npm test`.
 
 ### Author
 

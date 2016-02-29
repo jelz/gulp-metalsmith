@@ -87,6 +87,25 @@ test('Do not touch non-utf8 files', function (t) {
   }, t.pass));
 });
 
+test('Add metadata from configuration options', function (t) {
+  t.plan(3);
+
+  prepare('index.html', {
+    metadata: {
+      item1: true,
+      item2: ['list', 'of', 'things']
+    },
+    use: [testMiddleware]
+  });
+
+  function testMiddleware(files, m, next) {
+    var meta = m.metadata();
+    t.true(meta.item1);
+    t.equals(meta.item2.length, 3);
+    t.equals(meta.item2[2], 'things');
+  }
+});
+
 test('Frontmatter configuration option', function (t) {
   t.plan(2);
   prepare('index.html').pipe(stillIncludes(false));

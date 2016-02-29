@@ -5,20 +5,25 @@ var permalinks = require('metalsmith-permalinks');
 var layouts = require('metalsmith-layouts');
 
 gulp.task('default', ['metalsmith']);
-gulp.task('clean', function() { del('build/**'); });
-
-gulp.task('metalsmith', ['clean'], function() {
-    return gulp.src('src/**').
-        pipe(metalsmith({ use: get_plugins() })).
-        pipe(gulp.dest('build'));
+gulp.task('clean', function () {
+  del('build/**');
 });
 
-gulp.task('metalsmith-json', ['clean'], function() {
-    return gulp.src('json/**').
-        pipe(metalsmith.json({ use: get_plugins() })).
-        pipe(gulp.dest('build'));
+gulp.task('metalsmith', ['clean'], function () {
+  return gulp.src('src/**')
+    .pipe(metalsmith(getConfig()))
+    .pipe(gulp.dest('build'));
 });
 
-function get_plugins() {
-    return [ permalinks(), layouts({ engine: 'swig' }) ];
+gulp.task('metalsmith-json', ['clean'], function () {
+  return gulp.src('json/**')
+    .pipe(metalsmith.json(getConfig()))
+    .pipe(gulp.dest('build'));
+});
+
+function getConfig() {
+  return {
+    use: [permalinks(), layouts({engine: 'swig'})],
+    metadata: {site_title: 'sample static stite'}
+  };
 }
