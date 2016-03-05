@@ -4,60 +4,51 @@ var _ = require('lodash');
 
 var metalsmith = require('../lib/metalsmith.js');
 
-test('Metalsmith-compatible API', function (t) {
-  var API = [
-    'build',
-    'source',
-    'destination',
-    'clean',
-    'frontmatter',
-    'use',
-    'run',
-    'metadata',
-    'path'
+test('Metalsmith exposes a compatible API', function (t) {
+  var m = metalsmith();
+  var methods = [
+    'build', 'source', 'destination', 'clean',
+    'frontmatter', 'use', 'run', 'metadata', 'path'
   ];
 
-  var m = metalsmith();
-  t.plan(API.length);
-
-  API.forEach(function (method) {
-    t.true(_.isFunction(m[method]));
+  methods.forEach(function (method) {
+    t.ok(_.isFunction(m[method]));
   });
+  t.end();
 });
 
-test('Not implemented methods', function (t) {
+test('Metalsmith throws for not implemented methods', function (t) {
   var m = metalsmith();
-  var NOT_IMPLEMENTED = metalsmith.NOT_IMPLEMENTED;
-  t.plan(NOT_IMPLEMENTED.length);
 
-  NOT_IMPLEMENTED.forEach(function (method) {
+  metalsmith.NOT_IMPLEMENTED.forEach(function (method) {
     t.throws(m[method]);
   });
+  t.end();
 });
 
-test('Metadata getter/setter', function (t) {
+test('Metalsmith exposes a metadata getter/setter', function (t) {
   var m = metalsmith();
   var value = {test: 123, nested: {msg: 'Hello'}};
   t.deepEquals(m.metadata(), {});
-  t.equals(m.metadata(value), m);
-  t.equals(m.metadata(), value);
+  t.equal(m.metadata(value), m);
+  t.equal(m.metadata(), value);
   t.deepEquals(m.metadata(), {test: 123, nested: {msg: 'Hello'}});
   t.end();
 });
 
-test('Path getter', function (t) {
+test('Metalsmith exposes a path getter', function (t) {
   var cwd = process.cwd();
   var m = metalsmith();
-  t.equals(m.path(), cwd);
-  t.equals(m.path('../hello.txt'), path.resolve(cwd, '..', 'hello.txt'));
+  t.equal(m.path(), cwd);
+  t.equal(m.path('../hello.txt'), path.resolve(cwd, '..', 'hello.txt'));
   m = metalsmith('/tmp/metalsmith');
-  t.equals(m.path(), '/tmp/metalsmith');
-  t.equals(m.path('test/hello.txt'), '/tmp/metalsmith/test/hello.txt');
-  t.equals(m.path('../../test.html'), '/test.html');
+  t.equal(m.path(), '/tmp/metalsmith');
+  t.equal(m.path('test/hello.txt'), '/tmp/metalsmith/test/hello.txt');
+  t.equal(m.path('../../test.html'), '/test.html');
   t.end();
 });
 
-test('Middleware flow', function (t) {
+test('Metalsmith flows files through middleware functions', function (t) {
   var m = metalsmith();
   t.plan(3);
 
@@ -70,12 +61,10 @@ test('Middleware flow', function (t) {
     next();
   });
 
-  m.run({}, function () {
-    t.pass();
-  });
+  m.run({}, t.pass);
 });
 
-test('Running middleware functions', function (t) {
+test('Metalsmith passes the same files/metadata to middleware', function (t) {
   var m = metalsmith();
   t.plan(3);
 
@@ -89,13 +78,13 @@ test('Running middleware functions', function (t) {
   });
 
   m.run({}, function (err, files) {
-    t.true(_.isNull(err));
-    t.true(_.isObject(files.added_file));
-    t.equals(m.metadata().added_metadata, 123);
+    t.ok(_.isNull(err));
+    t.ok(_.isObject(files.added_file));
+    t.equal(m.metadata().added_metadata, 123);
   });
 });
 
-test('Handling middleware errors', function (t) {
+test('Metalsmith handles middleware errors', function (t) {
   var m = metalsmith();
   t.plan(2);
 
@@ -110,7 +99,7 @@ test('Handling middleware errors', function (t) {
   });
 
   m.run({}, function (err) {
-    t.true(_.isError(err));
-    t.equals(err.message, 'Second middleware error.');
+    t.ok(_.isError(err));
+    t.equal(err.message, 'Second middleware error.');
   });
 });

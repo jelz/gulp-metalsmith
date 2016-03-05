@@ -2,20 +2,24 @@ var test = require('tape');
 var gutil = require('gulp-util');
 var through = require('through2');
 var vinyl = require('vinyl-fs');
-var path = require('path');
+var pm = require('path');
 var fs = require('fs');
 var _ = require('lodash');
 
 var plugin = require('..');
 
-var base = _.partial(path.join, __dirname, 'fixtures');
+function base(path) {
+  return pm.join(__dirname, 'fixtures', path || '');
+}
+
+function read(path) {
+  return fs.readFileSync(base(path));
+}
 
 function prepare(globs, opts) {
   opts = _.extend({root: base()}, opts);
   globs = _.isString(globs) ? [globs] : globs;
-  globs = _.map(globs, function (glob) {
-    return base(glob || '');
-  });
+  globs = _.map(globs, base);
 
   return vinyl.src(globs).pipe(plugin(opts));
 }
@@ -24,7 +28,7 @@ function testContent(f, path, str, fn) {
   var fileMatches = f.path.substr(-path.length) === path;
   var contentMatches = _.includes(f.contents.toString(), str);
 
-  if (fn && fileMatches && contentMatches) {
+  if (_.isFunction(fn) && fileMatches && contentMatches) {
     fn();
   }
 }
@@ -33,9 +37,10 @@ test('Plugin is a function that returns a stream', function (t) {
   t.ok(_.isFunction(plugin));
   var p = plugin();
 
-  ['emit', 'on', 'pipe', 'push', 'write', 'end'].forEach(function (m) {
-    t.ok(_.isFunction(p[m]));
+  ['emit', 'on', 'pipe', 'push', 'write', 'end'].forEach(function (method) {
+    t.ok(_.isFunction(p[method]));
   });
+
   t.end();
 });
 
@@ -63,7 +68,7 @@ test('Plugin handles a stream of vinyl files of type "buffer"', function (t) {
   }, t.pass));
 });
 
-test('Plugin omits ignored files', function (t) {
+test('Plugin omits ignored files defined in opts.ignore', function (t) {
   t.plan(6);
   prepare('*.html', {ignore: 'index.html', use: testSingle});
   prepare('*', {ignore: ['*', '!*.jpg'], use: testMultiple});
@@ -81,11 +86,11 @@ test('Plugin omits ignored files', function (t) {
   }
 });
 
-test('Plugin does not touch non-utf8 files', function (t) {
+test('Plugin does not touch non-UTF8 files', function (t) {
   t.plan(3);
   prepare('*.jpg').pipe(through.obj(function (f, enc, cb) {
     t.ok(f.isBuffer());
-    t.ok(f.contents.equals(fs.readFileSync(base('trees.jpg'))));
+    t.ok(f.contents.equals(read('trees.jpg')));
     cb();
   }, t.pass));
 });
@@ -95,7 +100,7 @@ test('Plugin accepts a single middleware function', function (t) {
   prepare('index.html', {use: t.pass});
 });
 
-test('Plugin adds metadata items from configuration options', function (t) {
+test('Plugin adds metadata items from opts.metadata', function (t) {
   t.plan(3);
   prepare('*.html', {
     metadata: {
@@ -140,6 +145,17 @@ test('Plugin fails when Metalsmith or middleware fails', function (t) {
   }
 });
 
+test('Plugin does not touch JSON files if are not definitions', function (t) {
+  t.plan(3);
+  prepare('**', {use: testJson});
+
+  function testJson(files) {
+    t.ok(files['json/invalid.json']);
+    t.ok(files['json/pages.json']);
+    t.ok(files['json/pages.json'].contents.equals(read('json/pages.json')));
+  }
+});
+
 test('Plugin fails when JSON definitions are invalid', function (t) {
   t.plan(3);
   prepare('**', {json: 'json/invalid.json'}).on('error', isPluginError);
@@ -177,13 +193,27 @@ test('Plugin merges and creates pages from multiple JSON inputs', function (t) {
   }, t.pass));
 });
 
+test('Plugin mixes both regular and JSON defined files', function (t) {
+  t.plan(5);
+  var globs = ['*.html', 'json/map_page.json'];
+  var s = prepare(globs, {json: 'json/*.json', use: testFiles});
+
+  function testFiles(files) {
+    t.equal(_.values(files).length, 3);
+    t.ok(files['index.html']);
+    t.ok(files['index.html'].contents.toString().indexOf('Index') > -1);
+    t.ok(files['map.html']);
+    t.equal(files['map.html'].contents.toString(), '<h2>Map page</h2>');
+  }
+});
+
 test('Plugin converts all JSON files if opts.json is true', function (t) {
   t.plan(3);
   var globs = ['json/pages.json', 'json/*_page.json'];
   var s = prepare(globs, {json: true, use: testFiles});
 
   function testFiles(files) {
-    t.equals(_.values(files).length, 5);
+    t.equal(_.values(files).length, 5);
     t.ok(files['index.html']);
     t.ok(files['map.html']);
   }
