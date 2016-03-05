@@ -1,6 +1,6 @@
 {
   "name": "gulp-metalsmith",
-  "version": "0.2.2",
+  "version": "0.3.0",
   "description": "Lightweight gulp plugin for Metalsmith",
   "keywords": [
     "metalsmith",
@@ -27,9 +27,9 @@
     "globby": "^4.0.0",
     "gulp-util": "^3.0.4",
     "is-utf8": "^0.2.1",
-    "lodash": "^4.5.1",
+    "lodash": "^4.6.1",
     "through2": "^2.0.1",
-    "vinyl-fs": "^2.3.4",
+    "vinyl-fs": "^2.4.2",
     "ware": "^1.2.0"
   },
   "devDependencies": {
@@ -42,6 +42,6 @@
     "metalsmith-layouts": "^1.0.0",
     "metalsmith-permalinks": "^0.5.0",
     "swig": "^1.4.2",
-    "tape": "^4.4.0"
+    "tape": "^4.5.0"
   }
 }
