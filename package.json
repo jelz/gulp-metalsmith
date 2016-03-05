@@ -1,11 +1,13 @@
 {
   "name": "gulp-metalsmith",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "Lightweight gulp plugin for Metalsmith",
   "keywords": [
     "metalsmith",
     "gulp",
-    "gulpplugin"
+    "gulpplugin",
+    "static site",
+    "ssg"
   ],
   "repository": "jelz/gulp-metalsmith",
   "main": "lib/index.js",
