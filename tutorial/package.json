@@ -1,0 +1,12 @@
+{
+  "name": "gulp-metalsmith-tutorial",
+  "private": true,
+  "dependencies": {
+    "del": "^2.2.0",
+    "gulp": "^3.9.1",
+    "metalsmith": "^2.1.0",
+    "metalsmith-layouts": "^1.6.4",
+    "metalsmith-markdown": "^0.2.1",
+    "swig": "^1.4.2"
+  }
+}
