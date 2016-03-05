@@ -87,6 +87,16 @@ test('Do not touch non-utf8 files', function (t) {
   }, t.pass));
 });
 
+test('Accept a single middleware function', function (t) {
+  t.plan(1);
+
+  prepare('index.html', {
+    use: function () {
+      t.pass();
+    }
+  });
+});
+
 test('Add metadata from configuration options', function (t) {
   t.plan(3);
 
