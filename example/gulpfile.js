@@ -23,7 +23,11 @@ gulp.task('metalsmith-json', ['clean'], function () {
 
 function getConfig() {
   return {
-    use: [permalinks(), layouts({engine: 'swig'})],
+    ignore: 'src/*.tmp',
+    use: [
+      permalinks({relative: false}),
+      layouts({engine: 'swig'})
+    ],
     metadata: {site_title: 'sample static stite'}
   };
 }

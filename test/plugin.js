@@ -19,6 +19,8 @@ function prepareFn(dir, globs, opts) {
     return base(dir, glob || '');
   });
 
+  opts = _.extend({root: base()}, opts);
+
   return vinyl.src(globs).pipe(fn(opts));
 }
 
@@ -69,6 +71,23 @@ test('Handle a stream of buffered vinyl files', function (t) {
     testContent(f, 'contact.html', 'Contact page', t.pass);
     cb();
   }, t.pass));
+});
+
+test('Omit ignored files', function (t) {
+  t.plan(5);
+  prepare('**', {ignore: 'src/index.html', use: testSingle});
+  prepare('**', {ignore: ['src/**', '!src/*.jpg'], use: testMultiple});
+
+  function testSingle(files) {
+    t.equals(_.values(files).length, 2);
+    t.equals(files['contact.html'].title, 'Contact');
+    t.ok(files['trees.jpg']);
+  }
+
+  function testMultiple(files) {
+    t.equals(_.values(files).length, 1);
+    t.ok(files['trees.jpg']);
+  }
 });
 
 test('Do not touch non-utf8 files', function (t) {

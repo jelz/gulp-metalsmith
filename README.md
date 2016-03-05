@@ -32,7 +32,9 @@ All options:
 ```js
 s.pipe(metalsmith({
   // set Metalsmith's root directory, for example for locating templates, defaults to CWD
-  root: __dirname, 
+  root: __dirname,
+  // files to exclude from the build
+  ignore: ['src/*.tmp'],
   // read frontmatter, defaults to true
   frontmatter: true,
   // Metalsmith plugins to use
