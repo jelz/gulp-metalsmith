@@ -14,11 +14,11 @@
   "author": "Jakub Elżbieciak <jelz@post.pl> (https://elzbieciak.pl)",
   "license": "MIT",
   "scripts": {
-    "lint": "jshint lib/*.js test/*.js example/*.js tutorial/*.js",
+    "lint": "jshint lib/*.js test/*.js tutorial/*.js",
     "hint": "npm run lint",
     "test": "faucet test/*.js",
     "test-all": "npm run lint && npm test",
-    "clean": "rm -rf node_modules example/build",
+    "clean": "rm -rf node_modules coverage tutorial/node_modules tutorial/build",
     "coverage": "istanbul cover tape test/*.js",
     "coverage-codecov": "cat ./coverage/coverage.json | codecov"
   },
@@ -34,14 +34,9 @@
   },
   "devDependencies": {
     "codecov": "^1.0.1",
-    "del": "^2.2.0",
     "faucet": "0.0.1",
-    "gulp": "^3.8.11",
     "istanbul": "^0.4.2",
     "jshint": "^2.9.1",
-    "metalsmith-layouts": "^1.0.0",
-    "metalsmith-permalinks": "^0.5.0",
-    "swig": "^1.4.2",
     "tape": "^4.5.0"
   }
 }

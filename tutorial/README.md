@@ -81,7 +81,7 @@ strategy.
 ## Headless CMS
 
 Headless Content Management Systems offer advanced editing interfaces and then
-expose data via APIs. A variety of technology stacks can be used to utilize
+expose data via API. A variety of technology stacks can be used to utilize
 content created by editors.
 
 It's time to migrate articles to [Contentful][7]. You have to prepare Content
@@ -89,16 +89,16 @@ Type first (it's like a database table):
 
 ![Content Type](./content_type.png)
 
-Not you can ask your content editor to use the app to work with articles;
+Now you can ask your content editor to use the app to work with articles;
 
 ![Entry editor](./entry_editor.png)
 
 
 ## Closing the loop
 
-Now, instead of using Markdown files stored locally you need to fetch the data
-from Contentful and use it in your build. Official [Contentful client library
-for JavaScript][8] will make this task really simple:
+Instead of using Markdown files stored locally you need to fetch articles from
+Contentful and use it in your build. Official [Contentful client library for
+JavaScript][8] will make this task really simple:
 
 ```js
 gulp.task('contentful', function () {

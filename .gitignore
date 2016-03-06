@@ -1,6 +1,5 @@
 /.idea
 /node_modules
-/example/build
 /coverage
 /tutorial/node_modules
 /tutorial/build
