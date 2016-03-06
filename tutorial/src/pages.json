@@ -1,0 +1,20 @@
+{
+  "index.md": {
+    "title": "Hello!",
+    "order": 1,
+    "layout": "basic.swig",
+    "contents": "# Hello!\n\n![PC](pc.png)\n\nLorem ipsum dolor sit amet, consectetur adipiscing elit. Quisque aliquet, dui\nsed sagittis sodales, elit mi ornare purus, lacinia varius nisi augue in metus.\n \n## Why Foo Solutions?\n\nAliquam erat volutpat. Suspendisse sagittis, justo at dictum laoreet, sapien\narcu semper eros, sit amet consectetur sem felis quis velit. Sed at lectus ut\naugue faucibus pellentesque non quis sem. \n"
+  },
+  "offer.md": {
+    "title": "Offer",
+    "order": 2,
+    "layout": "basic.swig",
+    "contents": "# Offer\n\nVivamus ut orci volutpat ante aliquet egestas at sit amet odio. Donec eget\negestas arcu. Integer in mi quis lectus porta sagittis.\n\n## What else?\n\nDonec fringilla libero non massa ornare, sed rutrum nunc iaculis. Aliquam\ntempor ullamcorper ex, eu faucibus lacus malesuada non.\n"
+  },
+  "contact.md": {
+    "title": "Contact us",
+    "order": 3,
+    "layout": "basic.swig",
+    "contents": "# Contact us\n\nInteger et risus imperdiet erat tincidunt hendrerit eu lacinia dui. Donec\nbibendum at eros non vestibulum. Cras cursus pellentesque massa, a volutpat\nfelis pharetra ut.\n\n## 24/7 helpline\n\nSuspendisse mattis condimentum congue. Fusce gravida felis ut arcu tristique\neleifend. Pellentesque convallis vel enim in venenatis."
+  }
+}

@@ -2,6 +2,7 @@
   "name": "gulp-metalsmith-tutorial",
   "private": true,
   "dependencies": {
+    "contentful": "^3.0.7",
     "del": "^2.2.0",
     "gulp": "^3.9.1",
     "metalsmith": "^2.1.0",

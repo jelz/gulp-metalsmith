@@ -14,7 +14,7 @@
   "author": "Jakub Elżbieciak <jelz@post.pl> (https://elzbieciak.pl)",
   "license": "MIT",
   "scripts": {
-    "lint": "jshint lib/*.js test/*.js example/*.js",
+    "lint": "jshint lib/*.js test/*.js example/*.js tutorial/*.js",
     "hint": "npm run lint",
     "test": "faucet test/*.js",
     "test-all": "npm run lint && npm test",
