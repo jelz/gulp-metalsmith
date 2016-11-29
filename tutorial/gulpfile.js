@@ -1,10 +1,23 @@
 var gulp = require('gulp');
 var del = require('del');
-var metalsmith = require('..');
 var markdown = require('metalsmith-markdown');
 var layouts = require('metalsmith-layouts');
 var contentful = require('contentful');
 var fs = require('fs');
+
+/**
+ * PLEASE NOTE!
+
+ * Don't use a parent directory ("..") as we do it
+ * here for simplicity (you can clone the repo and
+ * tutorial works with the current version).
+ *
+ * When using this library as a package installed
+ * with npm, you have to require "gulp-metalsmith":
+ *
+ * const metalsmith = require('gulp-metalsmith');
+ */
+var metalsmith = require('..');
 
 gulp.task('default', ['watch']);
 

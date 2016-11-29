@@ -45,6 +45,9 @@ $ npm install --save-dev gulp-metalsmith
 The simplest build task (just copies all files from `src/` to `build/`):
 
 ```js
+const gulp = require('gulp');
+const metalsmith = require('gulp-metalsmith');
+
 gulp.task('metalsmith', function() {
   return gulp.src('src/**')
     .pipe(metalsmith())
@@ -55,6 +58,9 @@ gulp.task('metalsmith', function() {
 All options:
 
 ```js
+const gulp = require('gulp');
+const metalsmith = require('gulp-metalsmith');
+
 gulp.src('src/**').pipe(metalsmith({
   // Metalsmith's root directory, for example for locating templates, defaults to CWD
   root: __dirname,
