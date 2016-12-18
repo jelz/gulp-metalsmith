@@ -59,6 +59,21 @@ test('Plugin emits error for vinyl files of type "stream"', function (t) {
   s.end(file);
 });
 
+test('Plugin returns file path and base as it found it', function (t) {
+  t.plan(2);
+  var initialPath = '/path/to/file.html';
+  var initialBase = '/path/to/';
+  var file = new gutil.File({path:initialPath,base:initialBase,contents:new Buffer("content")});
+  var s = plugin();
+
+  s.on('data', function (file) {
+    t.equals(initialPath, file.path);
+    t.equals(initialBase, file.base);
+  });
+
+  s.end(file);
+});
+
 test('Plugin handles a stream of vinyl files of type "buffer"', function (t) {
   t.plan(3);
   prepare('*').pipe(through.obj(function (f, enc, cb) {
@@ -235,7 +250,7 @@ test('Plugin handles a JSON defined page w/o contents', function (t) {
   var s = prepare('json/empty_page.json', {json: true});
 
   s.pipe(through.obj(function (f, enc, cb) {
-    t.equal(f.path, 'empty.html');
+    t.equal(f.path.replace(f.base, ''), 'empty.html');
     t.equal(f.contents.toString(), '');
     cb();
   }, t.pass));
@@ -246,7 +261,7 @@ test('Plugin ignores invalid file keys in JSON definition', function (t) {
   var s = prepare('json/map_page.json', {json: true});
 
   s.pipe(through.obj(function (f, enc, cb) {
-    t.equal(f.path, 'map.html');
+    t.equal(f.path.replace(f.base, ''), 'map.html');
     cb();
   }, t.pass));
 });
