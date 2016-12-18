@@ -100,6 +100,17 @@ test('Plugin accepts a single middleware function', function (t) {
   prepare('index.html', {use: t.pass});
 });
 
+test('Plugin passes stat object to middleware functions', function (t) {
+  t.plan(2);
+  prepare('index.html', {use: testStat});
+
+  function testStat(files) {
+    var stat = files['index.html'].stat;
+    t.ok(stat instanceof fs.Stats);
+    t.ok(stat.isFile());
+  }
+});
+
 test('Plugin adds metadata items from opts.metadata', function (t) {
   t.plan(3);
   prepare('*.html', {
