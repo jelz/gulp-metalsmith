@@ -2,6 +2,7 @@ var test = require('tape');
 var gutil = require('gulp-util');
 var through = require('through2');
 var vinyl = require('vinyl-fs');
+var isVinylFile = require('vinyl').isVinyl;
 var pm = require('path');
 var fs = require('fs');
 var _ = require('lodash');
@@ -63,7 +64,11 @@ test('Plugin returns file path and base as it found it', function (t) {
   t.plan(2);
   var initialPath = '/path/to/file.html';
   var initialBase = '/path/to/';
-  var file = new gutil.File({path:initialPath,base:initialBase,contents:new Buffer("content")});
+  var file = new gutil.File({
+    path: initialPath,
+    base: initialBase,
+    contents: new Buffer('content')
+  });
   var s = plugin();
 
   s.on('data', function (file) {
@@ -123,6 +128,36 @@ test('Plugin passes stat object to middleware functions', function (t) {
     var stat = files['index.html'].stat;
     t.ok(stat instanceof fs.Stats);
     t.ok(stat.isFile());
+  }
+});
+
+test('Plugin creates new vinyl file if middleware lost reference', function (t) {
+  t.plan(4);
+  var vinyl = null;
+
+  prepare('index.html', {use: badMiddleware}).on('data', function (file) {
+    t.notEqual(vinyl, null);
+    t.notEqual(file, vinyl);
+    t.ok(isVinylFile(file));
+  });
+
+  function badMiddleware(files) {
+    var file = files['index.html'];
+    vinyl = file._vinyl;
+    t.ok(isVinylFile(file._vinyl));
+    delete file._vinyl;
+  }
+});
+
+test('x', function (t) {
+  t.plan(1);
+  prepare('index.html', {use: rename}).on('data', function (file) {
+    t.equal(file.path.replace(file.base, ''), 'home.html');
+  });
+
+  function rename(files) {
+    files['home.html'] = files['index.html'];
+    delete files['index.html'];
   }
 });
 
@@ -193,6 +228,17 @@ test('Plugin fails when JSON definitions are invalid', function (t) {
   function isPluginError(err) {
     t.ok(err instanceof gutil.PluginError);
   }
+});
+
+test('Plugin uses stat of JSON file for all pages created of it', function (t) {
+  t.plan(2);
+  prepare('json/pages.json', {
+    json: true,
+    use: function (f) {
+      t.ok(f['index.html'].stat instanceof fs.Stats);
+      t.ok(f['index.html'].stat === f['contact.html'].stat);
+    }
+  });
 });
 
 test('Plugin creates pages from JSON definitions', function (t) {
